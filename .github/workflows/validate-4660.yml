@@ -1,0 +1,43 @@
+name: Validate PR 4660 focused tests
+
+on:
+  push:
+    branches:
+      - ci/4660-focused-validation
+
+permissions:
+  contents: read
+
+jobs:
+  focused-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Install source-only test environment
+        run: |
+          uv venv --python 3.12
+          uv pip install --python .venv/bin/python \
+            torch --index-url https://download.pytorch.org/whl/cpu
+          uv pip install --python .venv/bin/python -r requirements/build.txt
+          uv pip install --python .venv/bin/python -r requirements/test.txt
+          NO_NATIVE_EXT=1 uv pip install --python .venv/bin/python \
+            -e . --no-build-isolation
+
+      - name: Lint changed files
+        run: |
+          uvx ruff format --check \
+            lmcache/v1/storage_backend/local_disk_backend.py \
+            tests/v1/storage_backend/test_local_disk_put_admission.py
+          uvx ruff check \
+            lmcache/v1/storage_backend/local_disk_backend.py \
+            tests/v1/storage_backend/test_local_disk_put_admission.py
+          git diff --check
+
+      - name: Run focused regression tests
+        run: |
+          .venv/bin/pytest -q --noconftest \
+            tests/v1/storage_backend/test_local_disk_put_admission.py
