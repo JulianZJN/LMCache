@@ -75,8 +75,7 @@ def test_try_insert_put_task_is_atomic() -> None:
         results[index] = worker.try_insert_put_task(key)
 
     threads = [
-        threading.Thread(target=register, args=(index,))
-        for index in range(num_threads)
+        threading.Thread(target=register, args=(index,)) for index in range(num_threads)
     ]
     for thread in threads:
         thread.start()
@@ -98,8 +97,7 @@ def test_rejected_put_can_be_retried_after_capacity_is_released() -> None:
     memory_obj = _create_memory_obj(10)
 
     with patch(
-        "lmcache.v1.storage_backend.local_disk_backend.asyncio."
-        "run_coroutine_threadsafe"
+        "lmcache.v1.storage_backend.local_disk_backend.asyncio.run_coroutine_threadsafe"
     ) as schedule:
         backend.submit_put_task(key, memory_obj)
 
@@ -113,8 +111,7 @@ def test_rejected_put_can_be_retried_after_capacity_is_released() -> None:
     backend.current_cache_size = 0
     backend.dict.clear()
     with patch(
-        "lmcache.v1.storage_backend.local_disk_backend.asyncio."
-        "run_coroutine_threadsafe"
+        "lmcache.v1.storage_backend.local_disk_backend.asyncio.run_coroutine_threadsafe"
     ) as schedule:
         backend.submit_put_task(key, memory_obj)
 
@@ -141,8 +138,7 @@ def test_insufficient_evictable_capacity_does_not_remove_resident_keys() -> None
     memory_obj = _create_memory_obj(60)
 
     with patch(
-        "lmcache.v1.storage_backend.local_disk_backend.asyncio."
-        "run_coroutine_threadsafe"
+        "lmcache.v1.storage_backend.local_disk_backend.asyncio.run_coroutine_threadsafe"
     ) as schedule:
         backend.submit_put_task(key, memory_obj)
 
@@ -169,8 +165,7 @@ def test_oversized_put_fails_before_registering_or_evicting() -> None:
     memory_obj = _create_memory_obj(120)
 
     with patch(
-        "lmcache.v1.storage_backend.local_disk_backend.asyncio."
-        "run_coroutine_threadsafe"
+        "lmcache.v1.storage_backend.local_disk_backend.asyncio.run_coroutine_threadsafe"
     ) as schedule:
         backend.submit_put_task(key, memory_obj)
 

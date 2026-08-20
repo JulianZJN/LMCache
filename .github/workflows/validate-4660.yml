@@ -24,8 +24,12 @@ jobs:
             torch --index-url https://download.pytorch.org/whl/cpu
           uv pip install --python .venv/bin/python -r requirements/build.txt
           uv pip install --python .venv/bin/python -r requirements/test.txt
-          NO_NATIVE_EXT=1 uv pip install --python .venv/bin/python \
+          NO_GPU_EXT=1 uv pip install --python .venv/bin/python \
             -e . --no-build-isolation
+
+      - name: Verify CPU device ops import
+        run: |
+          .venv/bin/python -c "from lmcache import device_ops; print(type(device_ops).__name__)"
 
       - name: Lint changed files
         run: |
