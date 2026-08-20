@@ -1,0 +1,30 @@
+name: Format PR 4660 test
+
+on:
+  push:
+    branches:
+      - ci/format-4660-test-v2
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Format test
+        run: uvx ruff format tests/v1/storage_backend/test_local_disk_put_admission.py
+
+      - name: Commit formatted test
+        run: |
+          git config user.name "JulianZJN"
+          git config user.email "148066842+JulianZJN@users.noreply.github.com"
+          git add -- tests/v1/storage_backend/test_local_disk_put_admission.py
+          git diff --cached --check
+          git commit -s -m "style: format local-disk admission test"
+          git push origin HEAD
